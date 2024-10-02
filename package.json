@@ -1,0 +1,7 @@
+{
+  "name": "advanced-frontend-testing",
+  "private": true,
+  "workspaces": [
+    "session-1/exercise-*/{problem,solution}"
+  ]
+}
