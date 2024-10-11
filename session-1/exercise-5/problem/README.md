@@ -24,8 +24,6 @@ You’ve already written tests for the `DockingSchedule` component, but it wasn�
 - **Better Abstraction, Better Tests**: Understand how composables help abstract complex logic and how this impacts the ease and reliability of our tests.
 - **Improved Code Maintenance**: Recognize that reducing tightly coupled dependencies makes both the code and tests more maintainable, especially as the application grows and changes over time.
 
-Here’s the updated **Tasks** section based on your provided `DockingSchedule.spec.js` file and `NEW_TASKS`:
-
 ---
 
 ## Tasks

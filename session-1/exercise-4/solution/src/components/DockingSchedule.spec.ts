@@ -15,6 +15,7 @@ import type {
   DockingWithSpacecraft,
 } from '@/types';
 import DockingForm from './DockingForm.vue';
+import { ofetch } from 'ofetch';
 
 // Mock child components
 vi.mock('./DockingForm.vue', () => ({
@@ -65,8 +66,6 @@ vi.mock('@/composables/useSpacecraft', () => ({
 vi.mock('ofetch', () => ({
   ofetch: vi.fn(),
 }));
-
-import { ofetch } from 'ofetch';
 
 describe('DockingSchedule', () => {
   beforeEach(() => {

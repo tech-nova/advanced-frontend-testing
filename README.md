@@ -26,7 +26,15 @@ Each exercise has a `problem` and `solution` folder. The `problem` folder contai
 
 Each exercise problem has a `README` with instructions on what to do. If you ever get stuck, there are hints in the `README` if you click on the toggles.
 
-**Note:** You should right click and "Open Preview" with the `README.md` file so you can view this as rendered Markdown. It will prevent you from accidentally seeing the hints.
+**Note:** You should right click and "Open Preview" with the `README.md` file so you can view this as rendered Markdown. It will prevent you from accidentally seeing the hints. You can also view in Github if you prefer.
+
+<details>
+  <summary>They look like this</summary>
+
+    This is a hint!
+
+  </details>
+</details>
 
 There are a lot of sub-tasks in each exercise!
 
