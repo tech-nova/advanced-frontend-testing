@@ -109,6 +109,7 @@ const button = screen.getByRole('button', {
 
 ```javascript
 const spacecrafts = await screen.findAllByRole('row');
+const table = await screen.findByRole('table');
 ```
 
 The `find*` queries will wait for the element to load (uses polling). The `*all*` queries will return an array of elements.

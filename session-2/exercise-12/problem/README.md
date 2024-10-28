@@ -31,6 +31,7 @@ You will be working with a `SpacecraftForm` component that allows users to submi
 - [Firing events with Vue Testing Library](https://testing-library.com/docs/dom-testing-library/api-events)
 - [Vue Router](https://router.vuejs.org/)
 - [Router isReady](https://router.vuejs.org/api/interfaces/Router.html#isReady)
+- [Mock POST requests with MSW](https://mswjs.io/docs/api/http/#httppost)
 
 ## Tasks
 
@@ -46,8 +47,8 @@ Now we'll update our test to check for correct form submission and validation.
 ```typescript
 export const useMockCreateSpacecraft = () => {
   server.use(
-    rest.post('/api/spacecraft', (req, res, ctx) => {
-      // Handle the POST request here
+    http.post('/api/spacecrafts', async ({ request }) => {
+      // Handler logic
     })
   );
 };

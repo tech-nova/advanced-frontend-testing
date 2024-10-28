@@ -2,6 +2,7 @@ import {
   render,
   screen,
   waitForElementToBeRemoved,
+  within,
 } from '@testing-library/vue';
 import { describe, it, expect, beforeEach } from 'vitest';
 import { createPinia, setActivePinia } from 'pinia';
@@ -131,18 +132,25 @@ describe('SpacecraftList.vue', () => {
 
       const rows = await screen.findAllByRole('row');
       expect(rows).toHaveLength(3);
+      const table = await screen.findByRole('table');
 
-      expect(screen.getByText('Apollo')).toBeDefined();
+      expect(within(table).getByText(Apollo)).toBeDefined();
       expect(
-        screen.getByText('Lunar Module')
+        within(table).getByText('Lunar Module')
       ).toBeDefined();
       expect(
-        screen.getByText('Neil Armstrong')
+        within(table).getByText('Neil Armstrong')
       ).toBeDefined();
 
-      expect(screen.getByText('Enterprise')).toBeDefined();
-      expect(screen.getByText('Explorer')).toBeDefined();
-      expect(screen.getByText('James Kirk')).toBeDefined();
+      expect(
+        within(table).getByText('Enterprise')
+      ).toBeDefined();
+      expect(
+        within(table).getByText('Explorer')
+      ).toBeDefined();
+      expect(
+        within(table).getByText('James Kirk')
+      ).toBeDefined();
     });
 
     it('shows loading state initially', () => {

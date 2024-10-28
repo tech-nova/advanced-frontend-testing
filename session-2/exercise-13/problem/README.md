@@ -110,9 +110,7 @@ Notice that `renders a list of spacecrafts` test still passes
 
 ```javascript
 const headers = screen.getAllByRole('columnheader');
-expect(headers).toHaveLength(5);
-expect(headers[0]).toHaveTextContent('Name');
-// ... check other headers
+expect(headers).toHaveLength(4);
 ```
 
 This will check that there are 5 headers and that the first one has the text "Name".
