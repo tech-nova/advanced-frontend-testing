@@ -1,0 +1,196 @@
+{
+  "info": {
+    "name": "h3 API Test Collection",
+    "_postman_id": "a1b2c3d4-e5f6-7890-abcd-1234567890ab",
+    "description": "Collection to test the h3 API with in-memory SQLite and FakerJS.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "version": "1.0.0"
+  },
+  "item": [
+    {
+      "name": "Spacecraft",
+      "description": "Endpoints for managing spacecrafts.",
+      "item": [
+        {
+          "name": "Get All Spacecrafts",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/spacecrafts",
+              "host": ["{{base_url}}"],
+              "path": ["api", "spacecrafts"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Spacecraft by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/spacecrafts/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "spacecrafts", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Spacecraft",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "name": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Endeavor Explorer\",\n    \"type\": \"Research\",\n    \"captain\": \"Jane Doe\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/spacecrafts",
+              "host": ["{{base_url}}"],
+              "path": ["api", "spacecrafts"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Spacecraft",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "name": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"captain\": \"John Smith\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/spacecrafts/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "spacecrafts", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Dockings",
+      "description": "Endpoints for managing dockings.",
+      "item": [
+        {
+          "name": "Get All Dockings",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/dockings",
+              "host": ["{{base_url}}"],
+              "path": ["api", "dockings"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Docking by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/dockings/:id",
+              "host": ["{{base_url}}"],
+              "path": ["api", "dockings", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Docking",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "name": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"spacecraftId\": \"{{spacecraft_id}}\",\n    \"dockingTime\": \"2024-12-01T12:00:00Z\",\n    \"bayId\": 5,\n    \"status\": \"scheduled\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/dockings",
+              "host": ["{{base_url}}"],
+              "path": ["api", "dockings"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Notifications",
+      "description": "Endpoints for managing notifications.",
+      "item": [
+        {
+          "name": "Get All Notifications",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/notifications",
+              "host": ["{{base_url}}"],
+              "path": ["api", "notifications"]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "spacecraft_id",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
