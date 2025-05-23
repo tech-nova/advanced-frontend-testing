@@ -12,8 +12,8 @@ import { createPinia, setActivePinia } from 'pinia';
 import type {
   Spacecraft,
   DockingWithSpacecraft,
-} from '@/types';
-import { useSpacecraft } from '@/composables/useSpacecraft';
+} from '../types';
+import { useSpacecraft } from '../composables/useSpacecraft';
 import { useMockServer } from '../../tests/useMockServer';
 
 vi.mock('./VideoViewerModal.vue', () => ({
@@ -41,13 +41,15 @@ describe('DockingSchedule', () => {
   const mockSpacecrafts = ref<Spacecraft[]>([
     {
       id: '1',
+      type: 'spacecraft',
       name: 'Spacecraft 1',
-      captainName: 'Captain 1',
+      captain: 'Captain 1',
     },
     {
       id: '2',
+      type: 'spacecraft',
       name: 'Spacecraft 2',
-      captainName: 'Captain 2',
+      captain: 'Captain 2',
     },
   ]);
 
