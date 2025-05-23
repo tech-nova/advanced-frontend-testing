@@ -54,13 +54,8 @@ describe('DockingSchedule', () => {
   const setupMocks = ({
     dockings = mockDockings,
     spacecrafts = mockSpacecrafts,
-    errorDockings = false,
   } = {}) => {
-    if (errorDockings) {
-      useErrorFetchingDockings();
-    } else {
-      useMockDockings(dockings);
-    }
+    useMockDockings(dockings);
     useMockSpacecrafts(spacecrafts);
   };
 
@@ -69,12 +64,16 @@ describe('DockingSchedule', () => {
       setupMocks();
       const { findByText } = render(DockingSchedule);
 
-      expect(await findByText('Docking Schedule')).toBeTruthy();
-      expect(await findByText('Schedule Docking')).toBeTruthy();
+      expect(
+        await findByText('Docking Schedule')
+      ).toBeTruthy();
+      expect(
+        await findByText('Schedule Docking')
+      ).toBeTruthy();
     });
 
     it('displays loading state when dockings are being fetched', async () => {
-      setupMocks({ dockings: [], spacecrafts: [] });
+      setupMocks({ dockings: [] });
       const { findByText } = render(DockingSchedule);
 
       expect(await findByText('Loading...')).toBeTruthy();
@@ -84,60 +83,73 @@ describe('DockingSchedule', () => {
       setupMocks();
       const { findByText } = render(DockingSchedule);
 
-      expect(await findByText('Apollo Voyager')).toBeTruthy();
-      expect(await findByText('Artemis Explorer')).toBeTruthy();
+      expect(
+        await findByText('Apollo Voyager')
+      ).toBeTruthy();
+      expect(
+        await findByText('Artemis Explorer')
+      ).toBeTruthy();
       expect(await findByText('John Doe')).toBeTruthy();
       expect(await findByText('Jane Smith')).toBeTruthy();
     });
 
     it('displays error message when there is an error in the docking store', async () => {
-      setupMocks({ errorDockings: true });
+      useErrorFetchingDockings();
       const { findByText } = render(DockingSchedule);
 
-      expect(await findByText('Error fetching dockings')).toBeTruthy();
+      expect(
+        await findByText('Error fetching dockings')
+      ).toBeTruthy();
     });
   });
 
   describe('Docking Scans', () => {
     it('does not display "View Scan" button for dockings without scans', async () => {
-      // Aucun docking n'a de scan
-      const dockingsSansScan = mockDockings.map(d => ({ ...d, scan: undefined }));
-      setupMocks({ dockings: dockingsSansScan });
+      const dockingWithoutScan = {
+        ...mockDockings[0],
+        status: 'docked',
+      };
+      setupMocks({ dockings: [dockingWithoutScan] });
       const { queryByText } = render(DockingSchedule);
 
       expect(await queryByText('View Scan')).toBeNull();
     });
 
     it('displays "View Scan" button for dockings with scans', async () => {
-      // Un docking a un scan
-      const dockingsAvecScan = [
-        { ...mockDockings[0], scan: new Blob() },
-        { ...mockDockings[1], scan: undefined },
-      ];
-      setupMocks({ dockings: dockingsAvecScan });
+      const dockingWithScan = {
+        ...mockDockings[0],
+        status: 'docked',
+        scan: new Blob(),
+      };
+      setupMocks({ dockings: [dockingWithScan] });
       const { findByText } = render(DockingSchedule);
 
       expect(await findByText('View Scan')).toBeTruthy();
     });
 
     it('does not display "Record Scan" button for scheduled or departed dockings', async () => {
-      // Statuts non "docked"
-      const dockings = [
-        { ...mockDockings[0], status: 'scheduled', scan: undefined },
-        { ...mockDockings[1], status: 'departed', scan: undefined },
-      ];
-      setupMocks({ dockings });
+      const scheduledDocking = {
+        ...mockDockings[0],
+        status: 'scheduled',
+      };
+      const departedDocking = {
+        ...mockDockings[1],
+        status: 'departing',
+      };
+      setupMocks({
+        dockings: [scheduledDocking, departedDocking],
+      });
       const { queryByText } = render(DockingSchedule);
 
       expect(await queryByText('Record Scan')).toBeNull();
     });
 
     it('displays "Record Scan" button for docked spacecraft', async () => {
-      // Statut "docked" sans scan
-      const dockings = [
-        { ...mockDockings[0], status: 'docked', scan: undefined },
-      ];
-      setupMocks({ dockings });
+      const dockedDocking = {
+        ...mockDockings[0],
+        status: 'docked',
+      };
+      setupMocks({ dockings: [dockedDocking] });
       const { findByText } = render(DockingSchedule);
 
       expect(await findByText('Record Scan')).toBeTruthy();
