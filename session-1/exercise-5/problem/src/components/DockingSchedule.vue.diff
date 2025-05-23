@@ -1,0 +1,191 @@
+14,16c14
+<     <div v-if="dockingStore.loading" class="text-center">
+<       Loading...
+<     </div>
+---
+>     <div v-if="loading" class="text-center">Loading...</div>
+20d17
+<         <!-- Table header -->
+42a40
+>               <!-- Display Captain's name -->
+50d47
+<               <!-- Action buttons for viewing scan or recording new scan -->
+70,74c67,68
+<       <div
+<         v-if="dockingStore.error"
+<         class="text-red-500 mt-4"
+<       >
+<         {{ dockingStore.error.message }}
+---
+>       <div v-if="error" class="text-red-500 mt-4">
+>         {{ error.message }}
+77c71
+<     <!-- Modal components for various actions -->
+---
+>     <!-- Docking form component for scheduling new dockings -->
+83a78
+>     <!-- Video scan modal component -->
+88a84
+>     <!-- Video viewer modal component -->
+98,99c94,95
+< import { ref, computed, onMounted } from 'vue';
+< import { ofetch } from 'ofetch';
+---
+> import { ref, computed } from 'vue';
+> import { useDocking } from '@/composables/useDocking';
+103,104c99
+< import VideoViewerModal from './VideoViewerModal.vue';
+< import { useDockingStore } from '@/stores/dockingStore';
+---
+> import VideoViewerModal from './VideoViewerModal.vue'; // Import the new VideoViewerModal component
+106c101
+< import { DockingWithSpacecraft } from '@/types';
+---
+> import { DockingWithSpacecraft } from '@/types'; // Corrected path
+108,113c103,110
+< /**
+< Purpose: This component displays a docking schedule for spacecraft and allows users to manage dockings.
+< Usage: Include this component in a Vue application to show and interact with docking schedules.
+< Limitations: Relies on external composables and API calls for data fetching and management.
+< Edge cases: Handles loading states, errors, and potential missing data (e.g., unknown spacecraft or captain names).
+< */
+---
+> // Destructure docking-related data and methods from useDocking composable
+> const {
+>   dockings,
+>   loading,
+>   error,
+>   scheduleDocking,
+>   addScanToDocking,
+> } = useDocking();
+115c112
+< // Use the spacecraft composable to get spacecraft data
+---
+> // Destructure spacecraft-related data and methods from useSpacecraft composable
+122,125c119
+< // Use the docking store
+< const dockingStore = useDockingStore();
+< 
+< // Reactive variables for controlling modal visibility
+---
+> // Reactive variable to control the visibility of the modal
+126a121,122
+> 
+> // Reactive variable to control the visibility of the video scan modal
+127a124,125
+> 
+> // Reactive variable to control the visibility of the video viewer modal
+130c128
+< // Reactive variables for managing current scan and docking data
+---
+> // Reactive variable to hold the current scan Blob
+132,176d129
+< const currentDockingId = ref<string | null>(null);
+< 
+< // Function to fetch dockings data from the API
+< const fetchDockings = async () => {
+<   try {
+<     dockingStore.setLoading(true);
+<     const data = await ofetch<DockingWithSpacecraft[]>(
+<       '/api/dockings'
+<     );
+<     dockingStore.setDockings(data);
+<   } catch (err) {
+<     dockingStore.setError(
+<       err instanceof Error
+<         ? err
+<         : new Error('An error occurred')
+<     );
+<   } finally {
+<     dockingStore.setLoading(false);
+<   }
+< };
+< 
+< // Function to schedule a new docking
+< const scheduleDocking = async (
+<   dockingData: Docking
+< ): Promise<void> => {
+<   try {
+<     const newDocking = await ofetch<DockingWithSpacecraft>(
+<       '/api/dockings',
+<       {
+<         method: 'POST',
+<         body: dockingData,
+<       }
+<     );
+<     dockingStore.addDocking(newDocking);
+<   } catch (err) {
+<     const error =
+<       err instanceof Error
+<         ? err
+<         : new Error(
+<             'An error occurred while scheduling docking'
+<           );
+<     dockingStore.setError(error);
+<     throw error;
+<   }
+< };
+178,209c131,132
+< /**
+<  * Add a scan to a docking entry in local state
+<  * Note: This method uses local state instead of API to avoid dealing with Blob objects
+<  * @param dockingId - The ID of the docking to update
+<  * @param scan - The scan Blob to add
+<  */
+< const addScanToDocking = async (
+<   dockingId: string,
+<   scan: Blob
+< ): Promise<void> => {
+<   try {
+<     const updatedDocking = dockingStore.dockings.find(
+<       (d: DockingWithSpacecraft) => d.id === dockingId
+<     );
+<     if (updatedDocking) {
+<       updatedDocking.scan = scan;
+<       dockingStore.updateDocking(dockingId, updatedDocking);
+<     }
+<   } catch (err) {
+<     const error =
+<       err instanceof Error
+<         ? err
+<         : new Error('An error occurred while adding scan');
+<     dockingStore.setError(error);
+<     throw error;
+<   }
+< };
+< 
+< // Fetch dockings data when component is mounted
+< onMounted(() => {
+<   fetchDockings();
+< });
+---
+> // Reactive variable to hold the current docking ID
+> const currentDockingId = ref<string | null>(null);
+211c134
+< // Helper function to format ISO date strings into a more readable format
+---
+> // Function to format ISO date strings into a more readable format
+216c139
+< // Handler for scheduling a new docking
+---
+> // Function to handle scheduling a new docking
+224c147
+<     console.error('Failed to schedule docking:', error);
+---
+>     console.error('Failed to schedule docking:', error); // Log error if scheduling fails
+228c151
+< // Handler for submitting a new scan
+---
+> // Function to handle scan submission
+236c159
+< // Handler for viewing an existing scan
+---
+> // Function to handle viewing an existing scan
+250c173
+<   if (dockingStore.loading || spacecraftLoading.value) {
+---
+>   if (loading.value || spacecraftLoading.value) {
+253c176
+<   return dockingStore.dockings.map(
+---
+>   return dockings.value.map(
