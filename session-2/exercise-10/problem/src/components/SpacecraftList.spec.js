@@ -119,7 +119,6 @@ describe('SpacecraftList.vue', () => {
 
     // 🛠️ Refactor: Rewrite this test to use Vue Testing Library
     it('renders a list of spacecrafts', async () => {
-      const {findAllByRole, findByRole } = renderComponent(SpacecraftList);
       useMockSpacecrafts([
         {
           id: 1,
@@ -135,12 +134,29 @@ describe('SpacecraftList.vue', () => {
         },
       ]);
 
-      const spacecrafts = await findAllByRole('row');
-      const table = await findByRole('table');
+      renderComponent(SpacecraftList);
 
-      expect(spacecrafts).toHaveLength(3);
+      const rows = await screen.findAllByRole('row');
+      expect(rows).toHaveLength(3);
+      const table = await screen.findByRole('table');
 
-      expect(table).toBeDefined();
+      expect(within(table).getByText('Apollo')).toBeDefined();
+      expect(
+        within(table).getByText('Lunar Module')
+      ).toBeDefined();
+      expect(
+        within(table).getByText('Neil Armstrong')
+      ).toBeDefined();
+
+      expect(
+        within(table).getByText('Enterprise')
+      ).toBeDefined();
+      expect(
+        within(table).getByText('Explorer')
+      ).toBeDefined();
+      expect(
+        within(table).getByText('James Kirk')
+      ).toBeDefined();
 
     });
 
