@@ -210,8 +210,11 @@ describe('SpacecraftList.vue', () => {
     it('displays an error message when server returns an error', async () => {
       // 🔄 Refresher: useErrorFetchingSpacecrafts mocks an error fetching spacecrafts
       useErrorFetchingSpacecrafts();
+      const wrapper = shallowMountComponent(SpacecraftList);
 
-      expect(screen.getByText('Network error')).toBeInTheDocument();
+      await flushPromises();
+
+      expect(wrapper.text()).toContain('Network error');
     });
   });
 
