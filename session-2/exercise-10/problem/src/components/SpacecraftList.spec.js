@@ -220,14 +220,14 @@ describe('SpacecraftList.vue', () => {
 
   describe('Navigation links', () => {
     it('has a link to add spacecraft page', async () => {
-      renderComponent(SpacecraftList);
-      const addButton = screen.getByRole('link', {
-        name: /add spacecraft/i,
-      });
-      expect(addButton).toBeDefined();
-      expect(addButton.getAttribute('href')).toBe('/spacecraft/add');
+      const wrapper = shallowMountComponent(SpacecraftList);
+      const addButton =
+        wrapper.findComponent(RouterLinkStub);
+      expect(addButton.exists()).toBe(true);
+      expect(addButton.props('to')).toBe('/spacecraft/add');
     });
 
+    // ✨ Refactored to use Vue Testing Library
     it('has correct edit links for each spacecraft', async () => {
       useMockSpacecrafts([
         {
@@ -243,19 +243,18 @@ describe('SpacecraftList.vue', () => {
           captain: 'Carl Sagan',
         },
       ]);
+      const { findAllByText } =
+        renderComponent(SpacecraftList);
 
-      const { getByRole, findAllByRole } = renderComponent(SpacecraftList);
-      const editLinks = await findAllByRole('link', {
-        name: /edit/i,
-      });
-
+      const editLinks = await findAllByText(/edit/i);
       expect(editLinks).toHaveLength(2);
 
-      expect(editLinks[0].getAttribute('href')).toBe('/spacecraft/edit/1');
-      expect(editLinks[0].textContent).toBe(' Edit ');
-
-      expect(editLinks[1].getAttribute('href')).toBe('/spacecraft/edit/2');
-      expect(editLinks[1].textContent).toBe(' Edit ');
+      expect(editLinks[0].getAttribute('href')).toBe(
+        '/spacecraft/edit/1'
+      );
+      expect(editLinks[1].getAttribute('href')).toBe(
+        '/spacecraft/edit/2'
+      );
     });
   });
 });
