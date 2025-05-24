@@ -161,6 +161,7 @@ describe('SpacecraftList.vue', () => {
     });
 
     it('shows loading state initially', () => {
+      const wrapper = shallowMountComponent(SpacecraftList);
       expect(wrapper.text()).toContain('Loading...');
     });
 
@@ -177,13 +178,33 @@ describe('SpacecraftList.vue', () => {
 
       renderComponent(SpacecraftList);
 
+      // Check that loading state is initially present
+      expect(
+        screen.getByText(/loading\.\.\./i)
+      ).toBeDefined();
+
+      // Wait for the loading element to disappear
       await waitForElementToBeRemoved(() =>
         screen.queryByText(/loading\.\.\./i)
       );
 
-      expect(screen.getByText('Apollo')).toBeInTheDocument();
-      expect(screen.getByText('Lunar Module')).toBeInTheDocument();
-      expect(screen.getByText('Neil Armstrong')).toBeInTheDocument();
+      // Verify that loading state is removed
+      expect(
+        screen.queryByText(/loading\.\.\./i)
+      ).toBeNull();
+
+      // Check if spacecrafts are displayed
+      const rows = screen.getAllByRole('row');
+      expect(rows).toHaveLength(2); // Header row + 1 spacecraft row
+
+      // Verify spacecraft data is displayed
+      expect(screen.getByText('Apollo')).toBeDefined();
+      expect(
+        screen.getByText('Lunar Module')
+      ).toBeDefined();
+      expect(
+        screen.getByText('Neil Armstrong')
+      ).toBeDefined();
     });
 
     it('displays an error message when server returns an error', async () => {
