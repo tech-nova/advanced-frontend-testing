@@ -31,14 +31,47 @@ interface Notification {
 
 // 👇 1. Create a `generateNotification` function
 // const generateNotification = (): Notification => ({});
+const generateNotification = (): Notification => ({
+  id: faker.string.uuid(),
+  message: faker.lorem.sentence(),
+  timestamp: faker.date.recent().toISOString(),
+});
 
 // 👇 3. Create a `generateSpacecraft` function
 // const generateSpacecraft = (): Spacecraft => ({});
+const generateSpacecraft = (): Spacecraft => ({
+  id: faker.string.uuid(),
+  name: faker.helpers.arrayElement([
+    'Voyager',
+    'Discovery',
+    'Enterprise',
+    'Falcon',
+    'Orion',
+  ]),
+  type: faker.helpers.arrayElement([
+    'Shuttle',
+    'Probe',
+    'Station',
+    'Lander',
+  ]),
+  captain: faker.person.fullName(),
+});
 
 // 👇 5. Create a `generateDocking` function
 // const generateDocking = (
 //   spacecraftId: string
 // ): Docking => ({});
+const generateDocking = (spacecraftId: string): Docking => ({
+  id: faker.string.uuid(),
+  spacecraftId,
+  dockingTime: faker.date.soon().toISOString(),
+  bayId: faker.number.int({ min: 1, max: 10 }),
+  status: faker.helpers.arrayElement([
+    'scheduled',
+    'docked',
+    'departing',
+  ]),
+});
 
 let spacecraft: Spacecraft[] = [];
 let dockings: Docking[] = [];
@@ -47,7 +80,8 @@ let notifications: Notification[] = [];
 const spacecraftHandlers = [
   // 👇 4. Update the GET `/spacecrafts` handler to use the `generateSpacecraft` function.
   http.get(`${API_BASE}/spacecrafts`, () => {
-    return HttpResponse.json(spacecraft);
+    const generatedSpacecraft = Array.from({ length: 5 }, generateSpacecraft);
+    return HttpResponse.json(generatedSpacecraft);
   }),
 
   http.get(`${API_BASE}/spacecrafts/:id`, ({ params }) => {
@@ -61,14 +95,7 @@ const spacecraftHandlers = [
   http.post(
     `${API_BASE}/spacecrafts`,
     async ({ request }) => {
-      const body = await request.json();
-      if (!body || typeof body !== 'object') {
-        return new HttpResponse(null, {
-          status: 400,
-          statusText: 'Invalid request body',
-        });
-      }
-
+      const body = await request.json() as Omit<Spacecraft, 'id'>;
       const newSpacecraft: Spacecraft = {
         ...body,
         id: faker.string.uuid(),
@@ -85,7 +112,7 @@ const spacecraftHandlers = [
     `${API_BASE}/spacecrafts/:id`,
     async ({ params, request }) => {
       const { id } = params;
-      const body = await request.json();
+      const body = await request.json() as Omit<Spacecraft, 'id'>;
       const found = spacecraft.find((s) => s.id === id);
       if (found) {
         const updatedSpacecraft = { ...found, ...body };
@@ -137,15 +164,7 @@ const dockingHandlers = [
       });
     }
 
-    const newDocking: Docking = {
-      ...body,
-      id: faker.string.uuid(),
-      spacecraftId: foundSpacecraft.id,
-      status: 'scheduled',
-      dockingTime: faker.date.soon().toISOString(),
-      bayId: faker.number.int({ min: 1, max: 10 }),
-    };
-
+    const newDocking = generateDocking(foundSpacecraft.id);
     dockings.push(newDocking);
     return HttpResponse.json(newDocking, { status: 201 });
   }),
@@ -154,6 +173,10 @@ const dockingHandlers = [
 // 👇 2. Update the GET `/notifications` handler to use the `generateNotification` function.
 const notificationHandlers = [
   http.get(`${API_BASE}/notifications`, () => {
+    notifications = Array.from(
+      { length: 5 },
+      generateNotification
+    );
     return HttpResponse.json(notifications);
   }),
 ];
