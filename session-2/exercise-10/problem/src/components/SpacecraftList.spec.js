@@ -94,7 +94,7 @@ describe('SpacecraftList.vue', () => {
         },
       ]);
 
-      wrapper = shallowMountComponent(SpacecraftList);
+      const wrapper = shallowMountComponent(SpacecraftList);
 
       // 💡 Note: We use flushPromises() to ensure all pending promises are resolved
       // This is important when testing components that fetch data asynchronously
