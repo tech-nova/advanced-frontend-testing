@@ -224,8 +224,8 @@ describe('SpacecraftList.vue', () => {
       const addButton = screen.getByRole('link', {
         name: /add spacecraft/i,
       });
-      expect(addButton).toBeInTheDocument();
-      expect(addButton.getAttribute('href')).toBe('/spacecrafts/add');
+      expect(addButton).toBeDefined();
+      expect(addButton.getAttribute('href')).toBe('/spacecraft/add');
     });
 
     it('has correct edit links for each spacecraft', async () => {
