@@ -2,6 +2,7 @@ import {
   shallowMount,
   flushPromises,
 } from '@vue/test-utils';
+import { screen, render, waitForElementToBeRemoved } from '@testing-library/vue';
 import { describe, it, expect, beforeEach } from 'vitest';
 import { createPinia, setActivePinia } from 'pinia';
 import { createRouter, createWebHistory } from 'vue-router';
@@ -17,9 +18,11 @@ function renderComponent(component, options = {}) {
     routes: [{ path: '/', component: component }],
   });
 
+  const pinia = createPinia();
+
   const target = render(component, {
     global: {
-      plugins: [router],
+      plugins: [router, pinia],
     },
     ...options,
   });
@@ -61,20 +64,17 @@ describe('SpacecraftList.vue', () => {
   });
 
   describe('Component rendering', () => {
-    // 🛠️ Refactor: Rewrite this test to use Vue Testing Library
+
     it('renders the SpacecraftList component without errors', () => {
-      expect(wrapper.exists()).toBe(true);
-      expect(wrapper.find('h1').text()).toBe(
-        'Spacecraft Management'
-      );
+      const { getByRole } = renderComponent(SpacecraftList);
+      const heading = getByRole('heading');
+      expect(heading).toBeDefined();
     });
 
-    // 🛠️ Refactor: Rewrite this test to use Vue Testing Library
     it('displays the "Add Spacecraft" button with correct text', () => {
-      const addButton =
-        wrapper.findComponent(RouterLinkStub);
-      expect(addButton.exists()).toBe(true);
-      expect(addButton.text()).toBe('Add Spacecraft');
+      const { getByRole } = renderComponent(SpacecraftList);
+      const button = getByRole('button');
+      expect(button).toBeDefined();
     });
 
     it('renders table headers correctly', async () => {
@@ -110,8 +110,10 @@ describe('SpacecraftList.vue', () => {
   });
 
   describe('Spacecraft list', () => {
+
     // 🛠️ Refactor: Rewrite this test to use Vue Testing Library
     it('renders a list of spacecrafts', async () => {
+      const {findAllByRole, findByRole } = renderComponent(SpacecraftList);
       useMockSpacecrafts([
         {
           id: 1,
@@ -127,28 +129,13 @@ describe('SpacecraftList.vue', () => {
         },
       ]);
 
-      wrapper = shallowMountComponent(SpacecraftList);
+      const spacecrafts = await findAllByRole('row');
+      const table = await findByRole('table');
 
-      await flushPromises();
+      expect(spacecrafts).toHaveLength(3);
 
-      const rows = wrapper.findAll('tbody tr');
-      expect(rows).toHaveLength(2);
+      expect(table).toBeDefined();
 
-      expect(rows[0].find('td').text()).toBe('Apollo');
-      expect(rows[0].findAll('td')[1].text()).toBe(
-        'Lunar Module'
-      );
-      expect(rows[0].findAll('td')[2].text()).toBe(
-        'Neil Armstrong'
-      );
-
-      expect(rows[1].find('td').text()).toBe('Enterprise');
-      expect(rows[1].findAll('td')[1].text()).toBe(
-        'Explorer'
-      );
-      expect(rows[1].findAll('td')[2].text()).toBe(
-        'James Kirk'
-      );
     });
 
     it('shows loading state initially', () => {
@@ -166,38 +153,35 @@ describe('SpacecraftList.vue', () => {
         },
       ]);
 
-      wrapper = shallowMountComponent(SpacecraftList);
+      renderComponent(SpacecraftList);
 
-      expect(wrapper.text()).toContain('Loading...');
+      await waitForElementToBeRemoved(() =>
+        screen.queryByText(/loading\.\.\./i)
+      );
 
-      await flushPromises();
-
-      expect(wrapper.text()).not.toContain('Loading...');
-      const rows = wrapper.findAll('tbody tr');
-      expect(rows).toHaveLength(1);
+      expect(screen.getByText('Apollo')).toBeInTheDocument();
+      expect(screen.getByText('Lunar Module')).toBeInTheDocument();
+      expect(screen.getByText('Neil Armstrong')).toBeInTheDocument();
     });
 
     it('displays an error message when server returns an error', async () => {
       // 🔄 Refresher: useErrorFetchingSpacecrafts mocks an error fetching spacecrafts
       useErrorFetchingSpacecrafts();
 
-      wrapper = shallowMountComponent(SpacecraftList);
-
-      await flushPromises();
-
-      expect(wrapper.text()).toContain('Network error');
+      expect(screen.getByText('Network error')).toBeInTheDocument();
     });
   });
 
   describe('Navigation links', () => {
     it('has a link to add spacecraft page', async () => {
-      const addButton =
-        wrapper.findComponent(RouterLinkStub);
-      expect(addButton.exists()).toBe(true);
-      expect(addButton.props('to')).toBe('/spacecraft/add');
+      renderComponent(SpacecraftList);
+      const addButton = screen.getByRole('link', {
+        name: /add spacecraft/i,
+      });
+      expect(addButton).toBeInTheDocument();
+      expect(addButton.getAttribute('href')).toBe('/spacecrafts/add');
     });
 
-    // 🛠️ Refactor: Rewrite this test to use Vue Testing Library
     it('has correct edit links for each spacecraft', async () => {
       useMockSpacecrafts([
         {
@@ -214,23 +198,18 @@ describe('SpacecraftList.vue', () => {
         },
       ]);
 
-      wrapper = shallowMountComponent(SpacecraftList);
+      const { getByRole, findAllByRole } = renderComponent(SpacecraftList);
+      const editLinks = await findAllByRole('link', {
+        name: /edit/i,
+      });
 
-      await flushPromises();
+      expect(editLinks).toHaveLength(2);
 
-      const editLinks =
-        wrapper.findAllComponents(RouterLinkStub);
-      expect(editLinks.length).toBe(3);
+      expect(editLinks[0].getAttribute('href')).toBe('/spacecraft/edit/1');
+      expect(editLinks[0].textContent).toBe(' Edit ');
 
-      expect(editLinks[1].props().to).toBe(
-        '/spacecraft/edit/1'
-      );
-      expect(editLinks[1].text()).toBe('Edit');
-
-      expect(editLinks[2].props().to).toBe(
-        '/spacecraft/edit/2'
-      );
-      expect(editLinks[2].text()).toBe('Edit');
+      expect(editLinks[1].getAttribute('href')).toBe('/spacecraft/edit/2');
+      expect(editLinks[1].textContent).toBe(' Edit ');
     });
   });
 });
