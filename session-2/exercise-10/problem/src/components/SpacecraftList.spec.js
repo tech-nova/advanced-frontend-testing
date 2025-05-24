@@ -1,14 +1,19 @@
 import {
-  shallowMount,
-  flushPromises,
-} from '@vue/test-utils';
-import { screen, render, waitForElementToBeRemoved } from '@testing-library/vue';
+  render,
+  screen,
+  waitForElementToBeRemoved,
+  within,
+} from '@testing-library/vue';
 import { describe, it, expect, beforeEach } from 'vitest';
 import { createPinia, setActivePinia } from 'pinia';
 import { createRouter, createWebHistory } from 'vue-router';
-import { RouterLinkStub } from '@vue/test-utils';
 import SpacecraftList from '@/components/SpacecraftList.vue';
 import { useMockServer } from '../../tests/useMockServer';
+import {
+  shallowMount,
+  flushPromises,
+  RouterLinkStub,
+} from '@vue/test-utils';
 
 // 💡 Note: You'll want to use this to help you refactor your tests
 // to use Vue Testing Library
@@ -18,11 +23,9 @@ function renderComponent(component, options = {}) {
     routes: [{ path: '/', component: component }],
   });
 
-  const pinia = createPinia();
-
   const target = render(component, {
     global: {
-      plugins: [router, pinia],
+      plugins: [router],
     },
     ...options,
   });
@@ -56,25 +59,28 @@ describe('SpacecraftList.vue', () => {
     useErrorFetchingSpacecrafts,
   } = useMockServer();
 
-  let wrapper;
-
   beforeEach(() => {
     setActivePinia(createPinia());
-    wrapper = shallowMountComponent(SpacecraftList);
   });
 
   describe('Component rendering', () => {
 
+    // ✨ Refactored to use Vue Testing Library
     it('renders the SpacecraftList component without errors', () => {
-      const { getByRole } = renderComponent(SpacecraftList);
-      const heading = getByRole('heading');
+      renderComponent(SpacecraftList);
+      const heading = screen.getByRole('heading', {
+        name: 'Spacecraft Management',
+      });
       expect(heading).toBeDefined();
     });
 
+    // ✨ Refactored to use Vue Testing Library
     it('displays the "Add Spacecraft" button with correct text', () => {
-      const { getByRole } = renderComponent(SpacecraftList);
-      const button = getByRole('button');
-      expect(button).toBeDefined();
+      renderComponent(SpacecraftList);
+      const addButton = screen.getByRole('link', {
+        name: /add/i,
+      });
+      expect(addButton).toBeDefined();
     });
 
     it('renders table headers correctly', async () => {
