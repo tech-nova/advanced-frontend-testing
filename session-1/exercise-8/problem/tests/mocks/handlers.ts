@@ -1,13 +1,10 @@
 import { faker } from '@faker-js/faker';
 import { http, HttpResponse } from 'msw';
 
+faker.seed(1030);
+
 const API_BASE = '/api';
 
-// 👇 7. Set a seed value here for FakerJS.
-
-/**
- * Use the types to help you generate the random data
- */
 interface Spacecraft {
   id: string;
   name: string;
@@ -29,42 +26,44 @@ interface Notification {
   timestamp: string;
 }
 
-// 👇 1. Create a `generateNotification` function
-// const generateNotification = (): Notification => ({});
-const generateNotification = (): Notification => ({
-  id: faker.string.uuid(),
-  message: faker.lorem.sentence(),
-  timestamp: faker.date.recent().toISOString(),
-});
-
-// 👇 3. Create a `generateSpacecraft` function
-// const generateSpacecraft = (): Spacecraft => ({});
 const generateSpacecraft = (): Spacecraft => ({
   id: faker.string.uuid(),
-  name: faker.helpers.arrayElement([
+  name: `${faker.helpers.arrayElement([
+    'Apollo',
+    'Artemis',
+    'Borealis',
+    'Caelum',
+    'Drakon',
+    'Eclipse',
+    'Fenix',
+    'Galactica',
+    'Helios',
+  ])} ${faker.helpers.arrayElement([
     'Voyager',
-    'Discovery',
-    'Enterprise',
-    'Falcon',
-    'Orion',
-  ]),
+    'Explorer',
+    'Pioneer',
+    'Odyssey',
+    'Ranger',
+    'Guardian',
+    'Sentinel',
+    'Nomad',
+    'Vanguard',
+  ])}`,
   type: faker.helpers.arrayElement([
-    'Shuttle',
-    'Probe',
-    'Station',
-    'Lander',
+    'Cargo',
+    'Passenger',
+    'Research',
+    'Military',
   ]),
   captain: faker.person.fullName(),
 });
 
-// 👇 5. Create a `generateDocking` function
-// const generateDocking = (
-//   spacecraftId: string
-// ): Docking => ({});
-const generateDocking = (spacecraftId: string): Docking => ({
+const generateDocking = (
+  spacecraftId: string
+): Docking => ({
   id: faker.string.uuid(),
   spacecraftId,
-  dockingTime: faker.date.soon().toISOString(),
+  dockingTime: faker.date.recent().toISOString(),
   bayId: faker.number.int({ min: 1, max: 10 }),
   status: faker.helpers.arrayElement([
     'scheduled',
@@ -73,15 +72,34 @@ const generateDocking = (spacecraftId: string): Docking => ({
   ]),
 });
 
-let spacecraft: Spacecraft[] = [];
-let dockings: Docking[] = [];
-let notifications: Notification[] = [];
+const generateNotification = (): Notification => ({
+  id: faker.string.uuid(),
+  message: faker.helpers.arrayElement([
+    'Docking scheduled',
+    'Docking completed',
+    'Docking cancelled',
+    'Emergency docking procedure initiated',
+    'Spacecraft departed',
+    'Docking bay maintenance',
+  ]),
+  timestamp: faker.date.recent().toISOString(),
+});
+
+let spacecraft: Spacecraft[] = Array.from(
+  { length: 6 },
+  generateSpacecraft
+);
+let dockings: Docking[] = spacecraft
+  .slice(0, 4)
+  .map((s) => generateDocking(s.id));
+let notifications: Notification[] = Array.from(
+  { length: 12 },
+  generateNotification
+);
 
 const spacecraftHandlers = [
-  // 👇 4. Update the GET `/spacecrafts` handler to use the `generateSpacecraft` function.
   http.get(`${API_BASE}/spacecrafts`, () => {
-    const generatedSpacecraft = Array.from({ length: 5 }, generateSpacecraft);
-    return HttpResponse.json(generatedSpacecraft);
+    return HttpResponse.json(spacecraft);
   }),
 
   http.get(`${API_BASE}/spacecrafts/:id`, ({ params }) => {
@@ -96,6 +114,13 @@ const spacecraftHandlers = [
     `${API_BASE}/spacecrafts`,
     async ({ request }) => {
       const body = await request.json() as Omit<Spacecraft, 'id'>;
+      if (!body || typeof body !== 'object') {
+        return new HttpResponse(null, {
+          status: 400,
+          statusText: 'Invalid request body',
+        });
+      }
+
       const newSpacecraft: Spacecraft = {
         ...body,
         id: faker.string.uuid(),
@@ -170,13 +195,8 @@ const dockingHandlers = [
   }),
 ];
 
-// 👇 2. Update the GET `/notifications` handler to use the `generateNotification` function.
 const notificationHandlers = [
   http.get(`${API_BASE}/notifications`, () => {
-    notifications = Array.from(
-      { length: 5 },
-      generateNotification
-    );
     return HttpResponse.json(notifications);
   }),
 ];
