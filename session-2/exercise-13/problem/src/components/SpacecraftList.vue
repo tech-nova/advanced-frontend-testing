@@ -20,65 +20,47 @@
       Loading...
     </div>
     <div v-else>
-      <table
-        class="min-w-full bg-space-dark-blue bg-opacity-80 rounded-lg overflow-hidden"
-      >
-        <thead class="bg-space-cosmic-purple">
-          <tr>
-            <th
-              class="py-3 px-4 text-space-starlight-white font-bold text-left"
-            >
-              Name
-            </th>
-            <th
-              class="py-3 px-4 text-space-starlight-white font-bold text-left"
-            >
-              Type
-            </th>
-            <th
-              class="py-3 px-4 text-space-starlight-white font-bold text-left"
-            >
-              Captain
-            </th>
-            <th
-              class="py-3 px-4 text-space-starlight-white font-bold text-left"
-            >
-              Actions
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr
+      <div role="table">
+        <div class="grid grid-cols-4" role="row">
+          <div
+            v-for="header in [
+              'Name',
+              'Type',
+              'Captain',
+              'Actions',
+            ]"
+            :key="header"
+            role="columnheader"
+          >
+            {{ header }}
+          </div>
+        </div>
+        <div role="rowgroup">
+          <div
             v-for="spacecraft in spacecrafts"
             :key="spacecraft.id"
-            class="border-b border-space-nebula-teal border-opacity-30 hover:bg-space-nebula-teal hover:bg-opacity-20 transition-colors duration-300"
+            class="grid grid-cols-4"
+            role="row"
           >
-            <td
-              class="py-3 px-4 text-space-starlight-white"
+            <div
+              v-for="prop in ['name', 'type', 'captain']"
+              :key="prop"
+              role="cell"
             >
-              {{ spacecraft.name }}
-            </td>
-            <td
-              class="py-3 px-4 text-space-starlight-white"
-            >
-              {{ spacecraft.type }}
-            </td>
-            <td
-              class="py-3 px-4 text-space-starlight-white"
-            >
-              {{ spacecraft.captain }}
-            </td>
-            <td class="py-3 px-4">
+              {{ spacecraft[prop] }}
+            </div>
+            <div role="cell">
               <router-link
                 :to="`/spacecraft/edit/${spacecraft.id}`"
                 class="text-space-nebula-teal hover:text-space-solar-flare transition-colors duration-300"
-              >
+                >
                 Edit
               </router-link>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div v-if="error" class="text-space-martian-red mt-4">
         {{ error.message }}
       </div>
