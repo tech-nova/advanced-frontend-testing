@@ -4,7 +4,21 @@ import { http, HttpResponse } from 'msw';
 import type {
   DockingWithSpacecraft,
   Spacecraft,
-} from '@/types';
+} from '../src/types';
+
+export const useMockCreateSpacecraft = () => {
+  server.use(
+    http.post('/api/spacecrafts', async ({ request }) => {
+        const { name, type, captain } = await request.json() as Omit<Spacecraft, 'id'>;
+        return HttpResponse.json({
+          id: 1,
+          name,
+          type,
+          captain,
+        });
+    })
+  );
+};
 
 export function useMockServer() {
   beforeAll(() => {

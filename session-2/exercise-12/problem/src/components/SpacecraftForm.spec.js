@@ -160,6 +160,13 @@ describe('SpacecraftForm.vue', () => {
 
     // 🛠️ Now we need to test the form submission and not just the navigation
     it('submits the form with correct data for a new spacecraft', async () => {
+      const mockSpacecraft = {
+        id: '1',
+        name: 'Enterprise',
+        type: 'Explorer',
+        captain: 'James Kirk',
+      };
+
       // Navigate to the add spacecraft page
       router.push('/spacecraft/add');
       await router.isReady();
@@ -175,15 +182,22 @@ describe('SpacecraftForm.vue', () => {
       expect(
         getByRole('heading', { name: 'Add Spacecraft' })
       ).toBeDefined();
+    expect(getByRole('button', { name: 'Add' })).toBeDefined();
 
-      // Navigate to the spacecraft page
+      // Fill in the form
+      const inputs = wrapper.findAll('input');
+      await inputs[0].setValue(mockSpacecraft.name);
+      await inputs[1].setValue(mockSpacecraft.type);
+      await inputs[2].setValue(mockSpacecraft.captain);
+
+      await wrapper.find('form').trigger('submit.prevent');
+
+      expect(wrapper.vm.form).toEqual(mockSpacecraft);
+
       router.push('/spacecraft');
       await router.isReady();
-
-      // Wait for the navigation to complete
-      await findByRole('heading', {
-        name: 'Spacecraft Management',
-      });
+      // Check if the spacecraft is created
+      expect(wrapper.vm.spacecrafts).toContainEqual(mockSpacecraft);
     });
 
     it('submits the form with correct data for an edited spacecraft', async () => {
