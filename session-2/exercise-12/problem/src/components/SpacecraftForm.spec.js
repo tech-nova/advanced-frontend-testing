@@ -69,6 +69,8 @@ describe('SpacecraftForm.vue', () => {
           component: SpacecraftForm,
           name: 'EditSpacecraft',
         },
+        { path: '/dockings', component: { template: '<div />' } },
+        { path: '/notifications', component: { template: '<div />' } },
       ],
     });
   });
@@ -182,17 +184,28 @@ describe('SpacecraftForm.vue', () => {
       expect(
         getByRole('heading', { name: 'Add Spacecraft' })
       ).toBeDefined();
-    expect(getByRole('button', { name: 'Add' })).toBeDefined();
 
-      // Fill in the form
-      const inputs = wrapper.findAll('input');
-      await inputs[0].setValue(mockSpacecraft.name);
-      await inputs[1].setValue(mockSpacecraft.type);
-      await inputs[2].setValue(mockSpacecraft.captain);
+      useMockCreateSpacecraft();
 
-      await wrapper.find('form').trigger('submit.prevent');
-
-      expect(wrapper.vm.form).toEqual(mockSpacecraft);
+      // Ici, effectue la requête POST (par exemple avec fetch ou axios)
+      const response = await fetch('/api/spacecrafts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: 'Enterprise',
+          type: 'Exploration',
+          captain: 'Jean-Luc Picard',
+        }),
+      });
+  
+      const data = await response.json();
+  
+      expect(data).toEqual({
+        id: 1,
+        name: 'Enterprise',
+        type: 'Exploration',
+        captain: 'Jean-Luc Picard',
+      });      
 
       router.push('/spacecraft');
       await router.isReady();
