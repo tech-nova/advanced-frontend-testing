@@ -6,20 +6,6 @@ import type {
   Spacecraft,
 } from '../src/types';
 
-export const useMockCreateSpacecraft = () => {
-  server.use(
-    http.post('/api/spacecrafts', async ({ request }) => {
-        const { name, type, captain } = await request.json() as Omit<Spacecraft, 'id'>;
-        return HttpResponse.json({
-          id: 1,
-          name,
-          type,
-          captain,
-        });
-    })
-  );
-};
-
 export function useMockServer() {
   beforeAll(() => {
     server.listen({ onUnhandledRequest: 'error' });
@@ -30,6 +16,19 @@ export function useMockServer() {
   afterAll(() => server.close());
 
   return {
+    useMockCreateSpacecraft : () => {
+      server.use(
+        http.post('/api/spacecrafts', async ({ request }) => {
+            const { name, type, captain } = await request.json() as Omit<Spacecraft, 'id'>;
+            return HttpResponse.json({
+              id: 1,
+              name,
+              type,
+              captain,
+            });
+        })
+      )
+    },
     useMockDockings: (
       mockDockings: DockingWithSpacecraft[]
     ) => {
