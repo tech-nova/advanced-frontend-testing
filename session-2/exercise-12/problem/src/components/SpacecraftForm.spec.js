@@ -1,5 +1,6 @@
 import { mount, flushPromises } from '@vue/test-utils';
 import { render } from '@testing-library/vue';
+import { render, fireEvent } from '@testing-library/vue';
 import {
   describe,
   it,
@@ -69,8 +70,6 @@ describe('SpacecraftForm.vue', () => {
           component: SpacecraftForm,
           name: 'EditSpacecraft',
         },
-        { path: '/dockings', component: { template: '<div />' } },
-        { path: '/notifications', component: { template: '<div />' } },
       ],
     });
   });
@@ -160,21 +159,22 @@ describe('SpacecraftForm.vue', () => {
       expect(inputs[2].element.value).toBe('James Kirk');
     });
 
-    // 🛠️ Now we need to test the form submission and not just the navigation
+    // ✨ Updated to fill out the form and submit it
     it('submits the form with correct data for a new spacecraft', async () => {
-      const mockSpacecraft = {
-        id: '1',
-        name: 'Enterprise',
-        type: 'Explorer',
-        captain: 'James Kirk',
-      };
+      // Set up mock data
+      useMockCreateSpacecraft();
 
       // Navigate to the add spacecraft page
       router.push('/spacecraft/add');
       await router.isReady();
 
       // Render the app so we can navigate between routes
-      const { getByRole, findByRole } = render(App, {
+      const {
+        getByLabelText,
+        getByRole,
+        findByText,
+        findByRole,
+      } = render(App, {
         global: {
           plugins: [router],
         },
@@ -185,32 +185,33 @@ describe('SpacecraftForm.vue', () => {
         getByRole('heading', { name: 'Add Spacecraft' })
       ).toBeDefined();
 
-      useMockCreateSpacecraft();
+      // Update the form fields
+      await fireEvent.update(
+        getByLabelText('Name'),
+        'New Spacecraft'
+      );
+      await fireEvent.update(
+        getByLabelText('Type'),
+        'Military'
+      );
+      await fireEvent.update(
+        getByLabelText('Captain'),
+        'John Doe'
+      );
 
-      // Ici, effectue la requête POST (par exemple avec fetch ou axios)
-      const response = await fetch('/api/spacecrafts', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: 'Enterprise',
-          type: 'Exploration',
-          captain: 'Jean-Luc Picard',
-        }),
+      // Submit the form
+      await fireEvent.submit(getByRole('form'));
+
+      // Wait for the navigation to complete
+      await findByRole('heading', {
+        name: 'Spacecraft Management',
       });
-  
-      const data = await response.json();
-  
-      expect(data).toEqual({
-        id: 1,
-        name: 'Enterprise',
-        type: 'Exploration',
-        captain: 'Jean-Luc Picard',
-      });      
 
-      router.push('/spacecraft');
-      await router.isReady();
-      // Check if the spacecraft is created
-      expect(wrapper.vm.spacecrafts).toContainEqual(mockSpacecraft);
+      // Verify that the form submission was successful
+      const newSpacecraft = await findByText(
+        'New Spacecraft'
+      );
+      expect(newSpacecraft).toBeDefined();
     });
 
     it('submits the form with correct data for an edited spacecraft', async () => {
