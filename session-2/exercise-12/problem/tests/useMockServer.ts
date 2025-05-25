@@ -4,7 +4,7 @@ import { http, HttpResponse } from 'msw';
 import type {
   DockingWithSpacecraft,
   Spacecraft,
-} from '../src/types';
+} from '@/types';
 
 export function useMockServer() {
   beforeAll(() => {
@@ -16,19 +16,6 @@ export function useMockServer() {
   afterAll(() => server.close());
 
   return {
-    useMockCreateSpacecraft : () => {
-      server.use(
-        http.post('/api/spacecrafts', async ({ request }) => {
-            const { name, type, captain } = await request.json() as Omit<Spacecraft, 'id'>;
-            return HttpResponse.json({
-              id: 1,
-              name,
-              type,
-              captain,
-            });
-        })
-      )
-    },
     useMockDockings: (
       mockDockings: DockingWithSpacecraft[]
     ) => {
@@ -56,6 +43,31 @@ export function useMockServer() {
     useErrorFetchingSpacecrafts: () => {
       server.use(
         http.get('/api/spacecrafts', () => {
+          return HttpResponse.error();
+        })
+      );
+    },
+    useMockCreateSpacecraft: () => {
+      server.use(
+        http.post(
+          '/api/spacecrafts',
+          async ({ request }) => {
+            const newSpacecraft =
+              (await request.json()) as Spacecraft;
+            return HttpResponse.json(
+              {
+                id: 'some-id',
+                ...newSpacecraft,
+              },
+              { status: 201 }
+            );
+          }
+        )
+      );
+    },
+    useErrorCreatingSpacecraft: () => {
+      server.use(
+        http.post('/api/spacecrafts', () => {
           return HttpResponse.error();
         })
       );
