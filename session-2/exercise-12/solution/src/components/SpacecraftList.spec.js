@@ -89,24 +89,26 @@ describe('SpacecraftList.vue', () => {
           captain: 'Neil Armstrong',
         },
       ]);
-      const wrapper = shallowMountComponent(SpacecraftList);
+      renderComponent(SpacecraftList);
 
-      // 💡 Note: We use flushPromises() to ensure all pending promises are resolved
-      // This is important when testing components that fetch data asynchronously
-      await flushPromises();
+      await screen.findByRole('table');
 
-      const headers = wrapper.findAll('thead th');
-      expect(headers).toHaveLength(4);
-
-      const headerTexts = headers.map((header) =>
-        header.text()
-      );
-      expect(headerTexts).toEqual([
-        'Name',
-        'Type',
-        'Captain',
-        'Actions',
-      ]);
+      expect(
+        screen.getByRole('columnheader', { name: /name/i })
+      ).toBeDefined();
+      expect(
+        screen.getByRole('columnheader', { name: /type/i })
+      ).toBeDefined();
+      expect(
+        screen.getByRole('columnheader', {
+          name: /captain/i,
+        })
+      ).toBeDefined();
+      expect(
+        screen.getByRole('columnheader', {
+          name: /actions/i,
+        })
+      ).toBeDefined();
     });
   });
 
