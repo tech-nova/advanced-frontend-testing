@@ -8,12 +8,16 @@
     <form
       @submit.prevent="handleSubmit"
       class="max-w-md bg-space-dark-blue bg-opacity-80 p-6 rounded-lg shadow-lg shadow-space-nebula-teal/10"
+      aria-label="Spacecraft Form"
     >
       <div class="mb-4">
-        <label class="block text-space-starlight-white"
+        <label
+          for="spacecraft-name"
+          class="block text-space-starlight-white"
           >Name</label
         >
         <input
+          id="spacecraft-name"
           v-model="form.name"
           type="text"
           class="w-full px-3 py-2 bg-space-dark-blue bg-opacity-80 text-space-starlight-white border border-space-nebula-teal border-opacity-50 rounded focus:border-opacity-100 focus:ring-2 focus:ring-space-nebula-teal focus:ring-opacity-50 outline-none"
@@ -28,10 +32,13 @@
         >
       </div>
       <div class="mb-4">
-        <label class="block text-space-starlight-white"
+        <label
+          for="spacecraft-type"
+          class="block text-space-starlight-white"
           >Type</label
         >
         <input
+          id="spacecraft-type"
           v-model="form.type"
           type="text"
           class="w-full px-3 py-2 bg-space-dark-blue bg-opacity-80 text-space-starlight-white border border-space-nebula-teal border-opacity-50 rounded focus:border-opacity-100 focus:ring-2 focus:ring-space-nebula-teal focus:ring-opacity-50 outline-none"
@@ -46,10 +53,13 @@
         >
       </div>
       <div class="mb-4">
-        <label class="block text-space-starlight-white"
+        <label
+          for="spacecraft-captain"
+          class="block text-space-starlight-white"
           >Captain</label
         >
         <input
+          id="spacecraft-captain"
           v-model="form.captain"
           type="text"
           class="w-full px-3 py-2 bg-space-dark-blue bg-opacity-80 text-space-starlight-white border border-space-nebula-teal border-opacity-50 rounded focus:border-opacity-100 focus:ring-2 focus:ring-space-nebula-teal focus:ring-opacity-50 outline-none"
