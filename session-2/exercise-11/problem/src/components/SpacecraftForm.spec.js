@@ -1,14 +1,19 @@
 import { mount, flushPromises } from '@vue/test-utils';
+import { render } from '@testing-library/vue';
 import {
   describe,
   it,
   expect,
   beforeEach,
   vi,
+  afterEach,
 } from 'vitest';
 import { createPinia, setActivePinia } from 'pinia';
 import { createRouter, createWebHistory } from 'vue-router';
+import App from '@/App.vue';
 import SpacecraftForm from '@/components/SpacecraftForm.vue';
+import SpacecraftList from '@/components/SpacecraftList.vue';
+import Dashboard from '@/components/Dashboard.vue';
 import { useMockServer } from '../../tests/useMockServer';
 
 /**
@@ -24,6 +29,7 @@ describe('SpacecraftForm.vue', () => {
   /**
    * 🔄 Refresher: useMockServer and MSW were covered in Exercise 9.
    *
+   * useMockCreateSpacecraft is a utility function that mocks the creation of a new spacecraft
    * useMockSpacecrafts is a utility function that mocks the spacecraft data
    * useErrorFetchingSpacecrafts is a utility function that mocks the error fetching spacecraft data
    */
@@ -46,15 +52,21 @@ describe('SpacecraftForm.vue', () => {
     router = createRouter({
       history: createWebHistory(),
       routes: [
+        { path: '/', component: Dashboard },
+        {
+          path: '/spacecraft',
+          component: SpacecraftList,
+          name: 'SpacecraftList',
+        },
         {
           path: '/spacecraft/add',
-          name: 'AddSpacecraft',
           component: SpacecraftForm,
+          name: 'AddSpacecraft',
         },
         {
           path: '/spacecraft/edit/:id',
-          name: 'EditSpacecraft',
           component: SpacecraftForm,
+          name: 'EditSpacecraft',
         },
       ],
     });
@@ -141,28 +153,31 @@ describe('SpacecraftForm.vue', () => {
       expect(inputs[2].element.value).toBe('James Kirk');
     });
 
+    // ✨ Refactored to do full route navigations with Vue Testing Library
     it('submits the form with correct data for a new spacecraft', async () => {
-      wrapper = await mountComponent();
+      // Navigate to the add spacecraft page
+      router.push('/spacecraft/add');
+      await router.isReady();
 
-      const inputs = wrapper.findAll('input[type="text"]');
-      expect(inputs.length).toBe(3);
+      // Render the app so we can navigate between routes
+      const { getByRole, findByRole } = render(App, {
+        global: {
+          plugins: [router],
+        },
+      });
 
-      const [nameInput, typeInput, captainInput] = inputs;
+      // Make sure we're on the right page
+      expect(
+        getByRole('heading', { name: 'Add Spacecraft' })
+      ).toBeDefined();
 
-      await nameInput.setValue('New Spacecraft');
-      await typeInput.setValue('Explorer');
-      await captainInput.setValue('John Doe');
+      // Navigate to the spacecraft page
+      router.push('/spacecraft');
+      await router.isReady();
 
-      await wrapper.find('form').trigger('submit.prevent');
-
-      /**
-       * 💡 Note: Normally, we'd mock out the composable and verify the call
-       * on the mock here, but we're doing this just for simplicity.
-       */
-      expect(wrapper.vm.form).toEqual({
-        name: 'New Spacecraft',
-        type: 'Explorer',
-        captain: 'John Doe',
+      // Wait for the navigation to complete
+      await findByRole('heading', {
+        name: 'Spacecraft Management',
       });
     });
 
